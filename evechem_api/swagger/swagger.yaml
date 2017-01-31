@@ -1,0 +1,1248 @@
+---
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "Evechem API"
+schemes:
+- "https"
+paths:
+  /info/towers/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all tower information.\n"
+      operationId: "info_towers_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "towers"
+            items:
+              $ref: "#/definitions/tower_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/towers/{type_id}:
+    get:
+      tags:
+      - "Info"
+      description: "Gets type details for a specific tower with `type_id`.\n"
+      operationId: "info_towers_type_id_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type_id"
+        in: "path"
+        description: "Type of the item that needs fetched."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/tower_info"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/equipment/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all equipment information.\n"
+      operationId: "info_equipment_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "equipment"
+            items:
+              $ref: "#/definitions/equipment_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/equipment/reactors/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all `reactor` type equipment.\n"
+      operationId: "info_equipment_reactors_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "reactors"
+            items:
+              $ref: "#/definitions/equipment_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/equipment/silos/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all `silo` type equipment.\n"
+      operationId: "info_equipment_silos_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "silos"
+            items:
+              $ref: "#/definitions/equipment_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/equipment/{type_id}/:
+    get:
+      tags:
+      - "Info"
+      summary: "..."
+      description: "Gets information about a specific silo or reactor of type `type_id`."
+      operationId: "info_equipment_type_id_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type_id"
+        in: "path"
+        description: "Type of the item that needs fetched."
+        required: true
+        type: "number"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/equipment_info"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/:
+    get:
+      tags:
+      - "Info"
+      description: "Get **array** of information for all materials, or if an array\
+        \ of `type_ids` is included, information on only those materials.\n"
+      operationId: "info_materials_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "materials"
+            items:
+              $ref: "#/definitions/material_info"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/booster/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of information for materials belonging to the `pure_booster`\
+        \ group.\n"
+      operationId: "info_materials_booster_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "raw_materials"
+            items:
+              $ref: "#/definitions/material_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/composites/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of information for materials belonging to the `composites`\
+        \ group.\n"
+      operationId: "info_materials_composites_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "composite_materials"
+            items:
+              $ref: "#/definitions/material_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/gas/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of information for materials belonging to the `wh_gas`\
+        \ or `booster_gas` groups.\n"
+      operationId: "info_materials_gas_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "raw_materials"
+            items:
+              $ref: "#/definitions/material_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/groups/:
+    get:
+      tags:
+      - "Info"
+      description: "Get **array** of information for all materials, or if an array\
+        \ of `type_ids` is included, information on only those materials.\n"
+      operationId: "info_materials_groups_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "groups"
+            items:
+              $ref: "#/definitions/group"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/intermediates/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of information for materials belonging to the `intermediates`\
+        \ group.\n"
+      operationId: "info_materials_intermediates_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "intermediate_materials"
+            items:
+              $ref: "#/definitions/material_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/polymer/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of information for materials belonging to the `hybrid_polymer`\
+        \ group.\n"
+      operationId: "info_materials_polymer_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "raw_materials"
+            items:
+              $ref: "#/definitions/material_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/raw/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of information for materials belonging to the `raw`\
+        \ (mined moon resource) group.\n"
+      operationId: "info_materials_raw_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "raw_materials"
+            items:
+              $ref: "#/definitions/material_info"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/materials/{type_id}:
+    get:
+      tags:
+      - "Info"
+      description: "Gets type details for a specific item with `type_id`.\n"
+      operationId: "info_materials_type_id_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type_id"
+        in: "path"
+        description: "Type of the item that needs fetched."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/material_info"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/reactions/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all information for `reaction` items that belong\
+        \ to any `reaction` group.\n"
+      operationId: "info_reactions_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "reactions"
+            items:
+              $ref: "#/definitions/reaction"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/reactions/complex/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all information for `reaction` items that belong\
+        \ to the `complex_reaction` group.\n"
+      operationId: "info_reactions_complex_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "complex_reactions"
+            items:
+              $ref: "#/definitions/reaction"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/reactions/complex_biochemical/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all information for `reaction` items that belong\
+        \ to the `complex_biochemical_reaction`group.\n"
+      operationId: "info_reactions_complex_biochemical_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "complex_biochemical_reactions"
+            items:
+              $ref: "#/definitions/reaction"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/reactions/polymer/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all information for `reaction` items that belong\
+        \ to the `biochemical_simple_reactions` group.\n"
+      operationId: "info_reactions_polymer_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "polymer_reactions"
+            items:
+              $ref: "#/definitions/reaction"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/reactions/simple/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all information for `reaction` items that belong\
+        \ to the `simple_reaction` or `unrefined_simple_reaction` groups.\n"
+      operationId: "info_reactions_simple_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "simple_reactions"
+            items:
+              $ref: "#/definitions/reaction"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/reactions/simple_biochemical/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets **array** of all information for `reaction` items that belong\
+        \ to the `simple_biochemical_reaction` group.\n"
+      operationId: "info_reactions_simple_biochemical_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            title: "simple_biochemical_reactions"
+            items:
+              $ref: "#/definitions/reaction"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /info/reactions/{type_id}/:
+    get:
+      tags:
+      - "Info"
+      description: "Gets information about a specific reaction of type `type_id`.\n"
+      operationId: "info_reactions_type_id_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type_id"
+        in: "path"
+        description: "Type of the item that needs fetched."
+        required: true
+        type: "number"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/reaction"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+  /towers/:
+    get:
+      tags:
+      - "Starbase"
+      description: "Gets summary information for every tower the request is authenticated\
+        \ to see.  This includes `tower_id` number, `type_id`, fuel status, as well\
+        \ as what the tower is producing at the endpoints of its reaction/mining chains.\n"
+      operationId: "towers_get"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            description: "Array of tower id numbers the authenticated user can interact\
+              \ with.\n"
+            items:
+              type: "integer"
+        401:
+          description: "Authentication Required"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+    post:
+      tags:
+      - "Starbase"
+      description: "Add new tower.\n"
+      operationId: "towers_post"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "tower"
+        description: "New tower information in json format."
+        required: true
+        schema:
+          $ref: "#/definitions/new_tower"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+  /towers/{tower_id}/:
+    get:
+      tags:
+      - "Starbase"
+      description: "Gets details for a specific tower with `type_id`.\n"
+      operationId: "towers_tower_id_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Type of the item that needs fetched."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/tower_details"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+    delete:
+      tags:
+      - "Starbase"
+      description: "Delete a specific tower and all its equipment/processes.\n"
+      operationId: "towers_tower_id_delete"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Id number of the tower to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+    patch:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_patch"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Id number of the tower to be deleted."
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "tower_update"
+        description: "Details to update tower with."
+        required: false
+        schema:
+          $ref: "#/definitions/tower_details"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/tower_details"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+  /towers/{tower_id}/processes/:
+    get:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/process"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+    post:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_post"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/process"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+  /towers/{tower_id}/processes/{process_id}/:
+    get:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_process_id_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      - name: "process_id"
+        in: "path"
+        description: "Process Id number to look under."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/process"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+    delete:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_process_id_delete"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      - name: "process_id"
+        in: "path"
+        description: "Process Id number to look under."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Authentication Required"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Not Found"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+  /towers/{tower_id}/processes/{process_id}/equipment/:
+    get:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_process_id_equipment_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      - name: "process_id"
+        in: "path"
+        description: "Process Id number to look under."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/equipment"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+    post:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_process_id_equipment_post"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      - name: "process_id"
+        in: "path"
+        description: "Process Id number to look under."
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "new_equipment"
+        required: true
+        schema:
+          $ref: "#/definitions/new_equipment"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/equipment"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/error"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+  /towers/{tower_id}/processes/{process_id}/equipment/{equipment_id}/:
+    get:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_process_id_equipment_equipment_id_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      - name: "process_id"
+        in: "path"
+        description: "Process Id number to look under."
+        required: true
+        type: "integer"
+      - name: "equipment_id"
+        in: "path"
+        description: "Id of equipment that needs fetched."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/equipment"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+    delete:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_process_id_equipment_equipment_id_delete"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      - name: "process_id"
+        in: "path"
+        description: "Process Id number to look under."
+        required: true
+        type: "integer"
+      - name: "equipment_id"
+        in: "path"
+        description: "Id of equipment that needs fetched."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+    patch:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_process_id_equipment_equipment_id_patch"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      - name: "process_id"
+        in: "path"
+        description: "Process Id number to look under."
+        required: true
+        type: "integer"
+      - name: "equipment_id"
+        in: "path"
+        description: "Id of equipment that needs fetched."
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "equipment"
+        required: true
+        schema:
+          $ref: "#/definitions/equipment_update"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/equipment"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/error"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+definitions:
+  equipment:
+    type: "object"
+    required:
+    - "id"
+    - "inputs"
+    - "outputs"
+    - "resource"
+    properties:
+      contains:
+        type: "integer"
+        description: "Quantity of material stored when last updated.\n"
+      id:
+        type: "integer"
+        description: "Unique id number for this equipment.\n"
+      inputs:
+        type: "array"
+        description: "Array of input links.\n"
+        items:
+          $ref: "#/definitions/link"
+      last_updated:
+        type: "integer"
+      outputs:
+        type: "array"
+        description: "Array of output links.\n"
+        items:
+          $ref: "#/definitions/link"
+      resource:
+        type: "integer"
+        description: "type_id of material/reaction being stored/mined/processed in\
+          \ this equipment.\n"
+    title: "equipment"
+  equipment_info:
+    required:
+    - "allowed_groups"
+    - "group"
+    - "name"
+    - "type"
+    properties:
+      allowed_groups:
+        type: "array"
+        description: "array of item groups that can be stored inside\n"
+        items:
+          type: "integer"
+          description: "item group id number\n"
+          title: "group_id"
+      capacity:
+        type: "number"
+        format: "float32"
+        description: "capacity in m3 of storage equipment\n"
+      current_resource:
+        type: "integer"
+        description: "current active resource (or reaction) type_id assigned to this\
+          \ equipment\n"
+      fitting:
+        $ref: "#/definitions/equipment_info_fitting"
+      group:
+        type: "integer"
+        description: "group equipment belongs to\n"
+      id:
+        type: "integer"
+        description: "unique id number of this deployed equipment\n"
+      name:
+        type: "string"
+        description: "name of equipment\n"
+      type:
+        type: "integer"
+        description: "eve type_id number of equipment\n"
+    title: "equipment_info"
+  equipment_info_fitting:
+    required:
+    - "cpu"
+    - "powergrid"
+    properties:
+      cpu:
+        type: "number"
+        format: "float32"
+      powergrid:
+        type: "number"
+        format: "float32"
+    description: "CPU and Powergrid requirement of onlining this equipment.\n"
+  equipment_update:
+    type: "object"
+    required:
+    - "last_updated"
+    properties:
+      contains:
+        type: "integer"
+      inputs:
+        type: "array"
+        description: "Array of input links.\n"
+        items:
+          $ref: "#/definitions/link"
+      last_updated:
+        type: "integer"
+      online:
+        type: "boolean"
+      outputs:
+        type: "array"
+        description: "Array of output links.\n"
+        items:
+          $ref: "#/definitions/link"
+      resource:
+        type: "integer"
+    title: "equipment_update"
+  error:
+    type: "object"
+    properties:
+      error:
+        type: "string"
+    title: "error"
+  group:
+    properties:
+      group:
+        type: "integer"
+      name:
+        type: "string"
+  link:
+    type: "object"
+    required:
+    - "equipment"
+    - "material"
+    properties:
+      equipment:
+        type: "integer"
+        description: "Equipment that is the source/target of this link.\n"
+      input:
+        type: "boolean"
+        description: "Optional boolean designating if this in an input or output link.\n"
+      material:
+        type: "integer"
+        description: "type_id of the linked material.\n"
+    title: "equipment_link"
+  location:
+    type: "object"
+    required:
+    - "moon"
+    - "planet"
+    properties:
+      moon:
+        type: "integer"
+      planet:
+        type: "integer"
+      system:
+        $ref: "#/definitions/location_system"
+  location_system:
+    required:
+    - "id"
+    - "name"
+    properties:
+      id:
+        type: "integer"
+      name:
+        type: "string"
+  material_info:
+    required:
+    - "group"
+    - "name"
+    - "type"
+    - "volume"
+    properties:
+      group:
+        type: "integer"
+        description: "group_id number material belongs to\n"
+      name:
+        type: "string"
+        description: "name of material\n"
+      type:
+        type: "integer"
+        description: "eve type_id number of material\n"
+      volume:
+        type: "number"
+        format: "float32"
+        description: "volume in m3 of single material unit\n"
+    title: "material_info"
+  new_equipment:
+    type: "object"
+    required:
+    - "type"
+    properties:
+      contains:
+        type: "integer"
+      name:
+        type: "string"
+      online:
+        type: "boolean"
+      resource:
+        type: "integer"
+      type:
+        type: "integer"
+    title: "new_equipment"
+  new_tower:
+    type: "object"
+    required:
+    - "location"
+    - "online"
+    - "type"
+    properties:
+      cycles_at:
+        type: "integer"
+        description: "Minute (0-59) in which this tower processes all fuel and silo/reaction\
+          \ cycles.\n"
+        minimum: 0
+        maximum: 59
+      fuel_count:
+        type: "integer"
+      fuel_last_udpate:
+        type: "integer"
+      location:
+        $ref: "#/definitions/location"
+      online:
+        type: "boolean"
+        description: "Online/offline status boolean.\n"
+      owner:
+        type: "integer"
+      type:
+        type: "integer"
+    title: "new_tower"
+  process:
+    type: "object"
+    properties:
+      equipment:
+        type: "array"
+        items:
+          $ref: "#/definitions/equipment"
+      final_outputs:
+        type: "array"
+        description: "Final products' material ids for this process tree.\n"
+        items:
+          type: "integer"
+      id:
+        type: "number"
+        description: "Unique process id number.\n"
+    title: "process"
+  reaction:
+    type: "object"
+    properties:
+      inputs:
+        type: "array"
+        description: "input material types and amounts\n"
+        items:
+          $ref: "#/definitions/reaction_outputs"
+      name:
+        type: "string"
+        description: "name of reaction\n"
+      outputs:
+        type: "array"
+        description: "output material types and amounts\n"
+        items:
+          $ref: "#/definitions/reaction_outputs"
+      type:
+        type: "integer"
+        description: "eve type_id number of material\n"
+    title: "reaction"
+  reaction_outputs:
+    properties:
+      amount:
+        type: "integer"
+      type:
+        type: "integer"
+  tower_details:
+    type: "object"
+    properties:
+      cycles_at:
+        type: "integer"
+        description: "Minute (0-59) in which this tower processes all fuel and silo/reaction\
+          \ cycles.\n"
+        minimum: 0
+        maximum: 59
+      fuel_count:
+        type: "integer"
+      fuel_last_update:
+        type: "integer"
+      id:
+        type: "integer"
+      location:
+        $ref: "#/definitions/location"
+      name:
+        type: "string"
+      online:
+        type: "boolean"
+        description: "Online/offline status boolean.\n"
+      processes:
+        type: "array"
+        description: "Process Ids that this tower has set up.\n"
+        items:
+          type: "integer"
+      sov:
+        type: "boolean"
+        description: "Whether or not the tower is anchored with a sovereignty fuel\
+          \ bonus active.\n"
+      type:
+        type: "integer"
+    title: "starbase_tower"
+  tower_info:
+    properties:
+      type:
+        type: "integer"
+      fuel_bay:
+        type: "integer"
+      stront_bay:
+        type: "integer"
+      name:
+        type: "string"
+      storage_mult:
+        type: "number"
+        format: "float32"
+      cpu:
+        type: "number"
+        format: "float32"
+      powergrid:
+        type: "number"
+        format: "float32"
+      fuel_usage:
+        type: "integer"
+      stront_usage:
+        type: "integer"
+      fuel_type:
+        type: "integer"

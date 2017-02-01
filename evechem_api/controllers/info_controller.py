@@ -10,6 +10,7 @@ from typing import List, Dict
 from six import iteritems
 from ..util import deserialize_date, deserialize_datetime
 
+from evechem_api.sqla_maps import info_map
 
 def info_equipment_get():
     """
@@ -142,8 +143,21 @@ def info_materials_type_id_get(type_id):
 
     :rtype: MaterialInfo
     """
-    return 'do some magic!'
+    session = info_map.Session()
+    q = session.query(info_map.Material).filter(info_map.Material.type == type_id)
 
+    mat = q.one_or_none() # return the only result or `None`
+
+    if mat is not None:
+        material_info = MaterialInfo(
+            type=mat.type,
+            group=mat.group_id,
+            name=mat.name,
+            volume=mat.volume)
+        return material_info, 200
+    else:
+        error = Error('Type {} Not Found'.format(type_id))
+        return error, 404
 
 def info_reactions_complex_biochemical_get():
     """

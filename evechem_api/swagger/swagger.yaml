@@ -23,8 +23,8 @@ paths:
             title: "towers"
             items:
               $ref: "#/definitions/tower_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
-  /info/towers/{type_id}:
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
+  /info/towers/{type_id}/:
     get:
       tags:
       - "Info"
@@ -47,7 +47,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/equipment/:
     get:
       tags:
@@ -65,7 +65,32 @@ paths:
             title: "equipment"
             items:
               $ref: "#/definitions/equipment_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
+  /info/equipment/{type_id}/:
+    get:
+      tags:
+      - "Info"
+      summary: "..."
+      description: "Gets information about a specific silo or reactor of type `type_id`."
+      operationId: "info_equipment_type_id_get"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "type_id"
+        in: "path"
+        description: "Type of the item that needs fetched."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "OK"
+          schema:
+            $ref: "#/definitions/equipment_info"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/equipment/reactors/:
     get:
       tags:
@@ -83,7 +108,7 @@ paths:
             title: "reactors"
             items:
               $ref: "#/definitions/equipment_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/equipment/silos/:
     get:
       tags:
@@ -101,32 +126,7 @@ paths:
             title: "silos"
             items:
               $ref: "#/definitions/equipment_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
-  /info/equipment/{type_id}/:
-    get:
-      tags:
-      - "Info"
-      summary: "..."
-      description: "Gets information about a specific silo or reactor of type `type_id`."
-      operationId: "info_equipment_type_id_get"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "type_id"
-        in: "path"
-        description: "Type of the item that needs fetched."
-        required: true
-        type: "number"
-      responses:
-        200:
-          description: "OK"
-          schema:
-            $ref: "#/definitions/equipment_info"
-        404:
-          description: "Not Found"
-          schema:
-            $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/materials/:
     get:
       tags:
@@ -149,7 +149,7 @@ paths:
           description: "Bad Request"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/materials/booster/:
     get:
       tags:
@@ -168,7 +168,7 @@ paths:
             title: "raw_materials"
             items:
               $ref: "#/definitions/material_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/materials/composites/:
     get:
       tags:
@@ -187,7 +187,7 @@ paths:
             title: "composite_materials"
             items:
               $ref: "#/definitions/material_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/materials/gas/:
     get:
       tags:
@@ -206,7 +206,7 @@ paths:
             title: "raw_materials"
             items:
               $ref: "#/definitions/material_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/materials/groups/:
     get:
       tags:
@@ -225,7 +225,7 @@ paths:
             title: "groups"
             items:
               $ref: "#/definitions/group"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/materials/intermediates/:
     get:
       tags:
@@ -244,7 +244,7 @@ paths:
             title: "intermediate_materials"
             items:
               $ref: "#/definitions/material_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/materials/polymer/:
     get:
       tags:
@@ -263,7 +263,7 @@ paths:
             title: "raw_materials"
             items:
               $ref: "#/definitions/material_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/materials/raw/:
     get:
       tags:
@@ -282,8 +282,8 @@ paths:
             title: "raw_materials"
             items:
               $ref: "#/definitions/material_info"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
-  /info/materials/{type_id}:
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
+  /info/materials/{type_id}/:
     get:
       tags:
       - "Info"
@@ -306,7 +306,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/reactions/:
     get:
       tags:
@@ -325,7 +325,7 @@ paths:
             title: "reactions"
             items:
               $ref: "#/definitions/reaction"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/reactions/complex/:
     get:
       tags:
@@ -344,7 +344,7 @@ paths:
             title: "complex_reactions"
             items:
               $ref: "#/definitions/reaction"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/reactions/complex_biochemical/:
     get:
       tags:
@@ -363,7 +363,7 @@ paths:
             title: "complex_biochemical_reactions"
             items:
               $ref: "#/definitions/reaction"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/reactions/polymer/:
     get:
       tags:
@@ -382,7 +382,7 @@ paths:
             title: "polymer_reactions"
             items:
               $ref: "#/definitions/reaction"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/reactions/simple/:
     get:
       tags:
@@ -401,7 +401,7 @@ paths:
             title: "simple_reactions"
             items:
               $ref: "#/definitions/reaction"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/reactions/simple_biochemical/:
     get:
       tags:
@@ -420,7 +420,7 @@ paths:
             title: "simple_biochemical_reactions"
             items:
               $ref: "#/definitions/reaction"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /info/reactions/{type_id}/:
     get:
       tags:
@@ -434,7 +434,7 @@ paths:
         in: "path"
         description: "Type of the item that needs fetched."
         required: true
-        type: "number"
+        type: "integer"
       responses:
         200:
           description: "OK"
@@ -444,7 +444,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.info_controller"
+      x-swagger-router-controller: "evechem_api.controllers.info_controller"
   /towers/:
     get:
       tags:
@@ -467,7 +467,7 @@ paths:
               type: "integer"
         401:
           description: "Authentication Required"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     post:
       tags:
       - "Starbase"
@@ -491,7 +491,7 @@ paths:
           description: "Authentication Required"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/:
     get:
       tags:
@@ -523,7 +523,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     delete:
       tags:
       - "Starbase"
@@ -550,7 +550,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     patch:
       tags:
       - "Starbase"
@@ -588,7 +588,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/processes/:
     get:
       tags:
@@ -621,7 +621,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     post:
       tags:
       - "Starbase"
@@ -653,7 +653,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/processes/{process_id}/:
     get:
       tags:
@@ -689,7 +689,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     delete:
       tags:
       - "Starbase"
@@ -714,7 +714,7 @@ paths:
           description: "Forbidden"
         404:
           description: "Not Found"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/processes/{process_id}/equipment/:
     get:
       tags:
@@ -752,7 +752,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     post:
       tags:
       - "Starbase"
@@ -798,7 +798,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/processes/{process_id}/equipment/{equipment_id}/:
     get:
       tags:
@@ -839,7 +839,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     delete:
       tags:
       - "Starbase"
@@ -875,7 +875,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     patch:
       tags:
       - "Starbase"
@@ -926,7 +926,7 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      x-swagger-router-controller: "swagger_server.controllers.starbase_controller"
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
 definitions:
   equipment:
     type: "object"
@@ -1164,11 +1164,9 @@ definitions:
   reaction:
     type: "object"
     properties:
-      inputs:
-        type: "array"
-        description: "input material types and amounts\n"
-        items:
-          $ref: "#/definitions/reaction_outputs"
+      type:
+        type: "integer"
+        description: "eve type_id number of material\n"
       name:
         type: "string"
         description: "name of reaction\n"
@@ -1176,17 +1174,22 @@ definitions:
         type: "array"
         description: "output material types and amounts\n"
         items:
-          $ref: "#/definitions/reaction_outputs"
+          $ref: "#/definitions/reaction_material"
+      inputs:
+        type: "array"
+        description: "input material types and amounts\n"
+        items:
+          $ref: "#/definitions/reaction_material"
+    title: "reaction"
+  reaction_material:
+    properties:
       type:
         type: "integer"
-        description: "eve type_id number of material\n"
-    title: "reaction"
-  reaction_outputs:
-    properties:
+      name:
+        type: "string"
       amount:
         type: "integer"
-      type:
-        type: "integer"
+
   tower_details:
     type: "object"
     properties:

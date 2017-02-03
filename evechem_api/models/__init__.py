@@ -16,6 +16,6 @@ from .new_equipment import NewEquipment
 from .new_tower import NewTower
 from .process import Process
 from .reaction import Reaction
-from .reaction_outputs import ReactionOutputs
+from .reaction_material import ReactionMaterial
 from .tower_details import TowerDetails
 from .tower_info import TowerInfo

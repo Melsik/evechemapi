@@ -1,13 +1,12 @@
 # coding: utf-8
-from sqlalchemy import Column, ForeignKey, Integer, Numeric, Table, Text
+from sqlalchemy import Column, ForeignKey, PrimaryKeyConstraint, Integer, Numeric, Table, Text, Float, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-engine = create_engine('sqlite:///./data/info.db')
+engine = create_engine('sqlite:///evechem_api/data/info.db')
 Session = sessionmaker(bind=engine)
-
 
 Base = declarative_base()
 metadata = Base.metadata
@@ -26,9 +25,9 @@ class Equipment(Base):
     type = Column(Integer, primary_key=True)
     group_id = Column(ForeignKey('groups.group_id'))
     name = Column(Text)
-    capacity = Column(Numeric)
-    cpu = Column(Numeric)
-    powergrid = Column(Numeric)
+    capacity = Column(Float)
+    cpu = Column(Float)
+    powergrid = Column(Float)
 
     group = relationship('Group')
     groups = relationship('Group', secondary='allowed_groups')
@@ -47,18 +46,21 @@ class Material(Base):
     type = Column(Integer, primary_key=True)
     group_id = Column(ForeignKey('groups.group_id'))
     name = Column(Text)
-    volume = Column(Numeric)
+    volume = Column(Float)
 
     group = relationship('Group')
 
 
-t_reaction_io = Table(
-    'reaction_io', metadata,
-    Column('reaction', ForeignKey('reactions.type')),
-    Column('input', Integer),
-    Column('material', ForeignKey('materials.type')),
-    Column('quantity', Integer)
-)
+class ReactionMaterial(Base):
+    __tablename__ = 'reaction_io'
+
+    reaction_id = Column('reaction', ForeignKey('reactions.type'),primary_key=True)
+    is_input = Column('is_input', Boolean, primary_key=True)
+    material_id = Column('material', ForeignKey('materials.type'),primary_key=True)
+    quantity = Column('quantity', Integer)
+
+    reaction = relationship('Reaction')
+    material = relationship('Material')
 
 
 class Reaction(Base):
@@ -70,20 +72,21 @@ class Reaction(Base):
 
     group = relationship('Group')
 
+    materials = relationship('ReactionMaterial')
+
 
 class Tower(Base):
     __tablename__ = 'towers'
 
     type = Column(Integer, primary_key=True)
-    fuel_bay = Column(Numeric)
-    stront_bay = Column(Numeric)
+    fuel_bay = Column(Float)
+    stront_bay = Column(Float)
     name = Column(Text)
-    storage_mult = Column(Numeric)
-    cpu = Column(Numeric)
-    powergrid = Column(Numeric)
+    storage_mult = Column(Float)
+    cpu = Column(Float)
+    powergrid = Column(Float)
     fuel_usage = Column(Integer)
     stront_usage = Column(Integer)
     fuel_type = Column(ForeignKey('materials.type'))
 
-    material = relationship('Material')
-
+    fuel = relationship('Material')

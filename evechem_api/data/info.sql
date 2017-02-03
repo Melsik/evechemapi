@@ -1,12 +1,12 @@
 BEGIN TRANSACTION;
 CREATE TABLE "towers" (
 	`type`	INTEGER,
-	`fuel_bay`	NUMERIC,
-	`stront_bay`	NUMERIC,
+	`fuel_bay`	REAL,
+	`stront_bay`	REAL,
 	`name`	TEXT,
-	`storage_mult`	NUMERIC,
-	`cpu`	NUMERIC,
-	`powergrid`	NUMERIC,
+	`storage_mult`	REAL,
+	`cpu`	REAL,
+	`powergrid`	REAL,
 	`fuel_usage`	INTEGER,
 	`stront_usage`	INTEGER,
 	`fuel_type`	INTEGER,
@@ -25,9 +25,10 @@ CREATE TABLE "reactions" (
 -- Input and output materials and the quantities related to each reaction.
 CREATE TABLE "reaction_io" (
 	`reaction`	INTEGER,
-	`input`	INTEGER,
+	`is_input`	INTEGER,
 	`material`	INTEGER,
 	`quantity`	INTEGER,
+	PRIMARY KEY(reaction,is_input,material),
 	FOREIGN KEY(reaction) REFERENCES reactions(type),
 	FOREIGN KEY(material) REFERENCES materials(type)
 );
@@ -37,7 +38,7 @@ CREATE TABLE "materials" (
 	`type`	INTEGER,
 	`group_id`	INTEGER,
 	`name`	TEXT,
-	`volume`	NUMERIC,
+	`volume`	REAL,
 	PRIMARY KEY(type),
 	FOREIGN KEY(group_id) REFERENCES groups(group_id)
 );
@@ -52,9 +53,9 @@ CREATE TABLE "equipment" (
 	`type`	INTEGER,
 	`group_id`	INTEGER,
 	`name`	TEXT,
-	`capacity`	NUMERIC,
-	`cpu`	NUMERIC,
-	`powergrid`	NUMERIC,
+	`capacity`	REAL,
+	`cpu`	REAL,
+	`powergrid`	REAL,
 	PRIMARY KEY(type),
 	FOREIGN KEY(group_id) REFERENCES groups(group_id)
 );
@@ -206,7 +207,7 @@ INSERT INTO `reactions` (type,group_id,name) VALUES (16868,661,'Standard Blue Pi
  (33365,484,'Plasmonic Metamaterials Reaction'),
  (33366,484,'Terahertz Metamaterials Reaction');
 
-INSERT INTO `reaction_io` (reaction,input,material,quantity) VALUES (16868,0,3645,95),
+INSERT INTO `reaction_io` (reaction,is_input,material,quantity) VALUES (16868,0,3645,95),
  (16868,0,25237,15),
  (16868,1,3645,100),
  (16868,1,25268,20),

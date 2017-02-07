@@ -3,13 +3,16 @@ from .exceptions import KeyNotFound
 class BaseKey(object):
 	valid_permissions = set()
 	def __init__(self, key_value, permissions=[]):
-		self.value = key
+		self.key_value = key_value
 		# make sure all permissions are valid
 		for p in permissions:
-			if p not in valid_permissions:
-				raise ValueError("{} Not a valid permission for Key type {}".format(str(p),type(self)))
+			if p not in type(self).valid_permissions:
+				raise ValueError("Permission: `{}` not valid for key of type: {}".format(str(p),type(self).__name__))
 		
 		self.permissions = set(permissions)
+
+	def __str__(self):
+		return self.key_value
 
 	@classmethod
 	def lookup(cls, key_value):
@@ -25,9 +28,9 @@ class BaseKeyControl(object):
 		self.key_param = key_param
 		self.key_type = key_type
 
-	def restricted(self, controller, requires, require_any=True):
-		'''restricted(controller, access_levels)
-		Descorator for resource controllers.  Restricts access to an endpoint
+	def restricted(self, requires, require_any=True):
+		'''restricted(requires,require_any)
+		Creates a decorator for resource controllers.  Restricts access to an endpoint
 		so that a key of with an access level in `requires` must be provided
 		to interface with the resource.
 
@@ -46,31 +49,33 @@ class BaseKeyControl(object):
 
 		if set(requires) > set(self.key_type.valid_permissions):
 			raise ValueError('`required` includes invalid permissions for this key type.')
+		def wrap(controller):
 
-		def restricted_controller(*args, **kwargs):
-			'''Restricted resource controller.'''
-			if self.key_param in kwargs:
-				try:
-					key = self.key_type.lookup(kwargs[self.key_param])
-					# exhange original key param with new key object
-					kwargs[self.key_param] = key
-				except KeyNotFound:
+			def restricted_controller(*args, **kwargs):
+				'''Restricted resource controller.'''
+				if self.key_param in kwargs:
+					try:
+						key = self.key_type.lookup(kwargs[self.key_param])
+						# exhange original key param with new key object
+						kwargs[self.key_param] = key
+					except KeyNotFound:
+						return self.unauthorized()
+				else:
 					return self.auth_required()
-			else:
-				return self.auth_required()
 
-			if require_any:
-				# if the key has any of the permissions required
-				if set(key.permissions) <= set(requires):
-					return controller(*args,**kwargs)
-			else:
-				# if the key has all of the permissions required
-				if set(permissions) == set(requires):
-					return controller(*args, **kwargs)
+				if require_any:
+					# if the key has any of the permissions required
+					if set(key.permissions) <= set(requires):
+						return controller(*args,**kwargs)
+				else:
+					# if the key has all of the permissions required
+					if set(permissions) == set(requires):
+						return controller(*args, **kwargs)
 
-			return self.unauthorized()
+				return self.unauthorized()
 
-		return restricted_controller
+			return restricted_controller
+		return wrap
 
 	def auth_required(self):
 		'''auth_required()

@@ -2,12 +2,19 @@ import connexion
 from evechem_api.models.error import Error
 from evechem_api.models.operation import Operation
 from evechem_api.models.operation_name import OperationName
+from evechem_api.models.key_type import KeyType
 from datetime import date, datetime
 from typing import List, Dict
 from six import iteritems
 from ..util import deserialize_date, deserialize_datetime
 
+from evechem_api.maps import application_map
+from sqlalchemy.orm import aliased
+
 from evechem_api.security.definitions import APIKeyControl, APIKey
+
+# used to generate keys
+import uuid
 
 keycontrol = APIKeyControl(key_type=APIKey, key_param='api_key')
 
@@ -22,7 +29,14 @@ def operation_delete(api_key):
 
     :rtype: None
     """
-    return 'do some magic!'
+    session = application_map.Session()
+
+    session.query(application_map.Key).filter(application_map.Key.operation_id == api_key.operation_id).delete()
+    session.query(application_map.Operation).filter(application_map.Operation.operation_id == api_key.operation_id).delete()
+
+    session.commit()
+
+    return None, 200
 
 @keycontrol.restricted(requires=['master'])
 def operation_get(api_key):
@@ -34,7 +48,7 @@ def operation_get(api_key):
 
     :rtype: Operation
     """
-    return 'do some magic!'
+    return str(api_key.operation_id),200
 
 @keycontrol.restricted(requires=['master'])
 def operation_keys_get(api_key):
@@ -46,19 +60,51 @@ def operation_keys_get(api_key):
 
     :rtype: List[str]
     """
-    return 'do some magic!'
+    Key = aliased(application_map.Key)
+    Permission = aliased(application_map.Permission)
+
+    session = application_map.Session()
+    q = session.query(Key).join(Permission).filter(Permission.name != 'master').filter(Key.operation_id == api_key.operation_id)
+    q_keys = q.all()
+
+    keys = [k.key for k in q_keys]
+
+    return keys,200
 
 @keycontrol.restricted(requires=['master'])
-def operation_keys_post(api_key):
+def operation_keys_post(api_key, key_type):
     """
     operation_keys_post
     Creates a new operation access sub-key with the access scopes provided, and then returns the key in the response. 
     :param api_key: Operation Master Access Key
     :type api_key: str
+    :param key_type: KeyType level of new key
+    :type key_type: KeyType
 
     :rtype: str
     """
-    return 'do some magic!'
+    if connexion.request.is_json:
+        key_type = KeyType.from_dict(connexion.request.get_json())
+
+    
+    session = application_map.Session()
+
+    Key = aliased(application_map.Key)
+    Permission = aliased(application_map.Permission)
+
+    key_value = uuid.uuid4().hex
+    key_level = session.query(Permission).filter(Permission.name == key_type.permission).one_or_none().level
+
+    if key_level is None:
+        error = Error('Bad Request: Permission {} is not valid.'.format(key_type.permission))
+        return error, 400
+    new_key = application_map.Key(
+        key=key_value,
+        permission_level=key_level,
+        operation_id=api_key.operation_id)
+    session.add(new_key)
+    session.commit()
+    return key_value, 200
 
 @keycontrol.restricted(requires=['master'])
 def operation_keys_sub_key_delete(sub_key, api_key):
@@ -72,7 +118,21 @@ def operation_keys_sub_key_delete(sub_key, api_key):
 
     :rtype: None
     """
-    return 'do some magic!'
+    Key = application_map.Key
+    session = application_map.Session()
+    q = session.query(Key).filter(Key.key == sub_key).filter(Key.operation_id == api_key.operation_id)
+    q_key = q.one_or_none()
+    if q_key is None:
+        error = Error('API Key not Found')
+        return error, 404
+    elif q_key.permission.name == 'master':
+        error = Error('Bad Request: Cannot delete master key.')
+        return error, 400
+    else:
+        q.delete()
+    session.commit()
+
+    return None, 200
 
 @keycontrol.restricted(requires=['master'])
 def operation_keys_sub_key_get(sub_key, api_key):
@@ -84,9 +144,17 @@ def operation_keys_sub_key_get(sub_key, api_key):
     :param api_key: Operation Master Access Key
     :type api_key: str
 
-    :rtype: KeyType
+    :rtype: permission
     """
-    return 'do some magic!'
+    Key = application_map.Key
+    session = application_map.Session()
+    q_key = session.query(Key).filter(Key.key == sub_key).filter(Key.operation_id == api_key.operation_id).one_or_none()
+    if q_key is None:
+        error = Error('API Key not Found')
+        return error, 404
+    else:
+        permission = {'permission':q_key.permission.name}
+        return permission, 200
 
 @keycontrol.restricted(requires=['master'])
 def operation_keys_sub_key_patch(sub_key, api_key, key_type):
@@ -98,13 +166,35 @@ def operation_keys_sub_key_patch(sub_key, api_key, key_type):
     :param api_key: Operation Master Access Key
     :type api_key: str
     :param key_type:
-    :type key_type: dict | bytes
+    :type key_type: KeyType
 
     :rtype: KeyType
     """
     if connexion.request.is_json:
         key_type = KeyType.from_dict(connexion.request.get_json())
-    return 'do some magic!'
+
+    Key = application_map.Key
+    Permission = application_map.Permission
+
+    session = application_map.Session()
+    permission = session.query(Permission).filter(Permission.name == key_type.permission).filter(Permission.name != 'master').one_or_none()
+
+    if permission is None:
+        error = Error('Bad Request: Permission {} is not valid.'.format(key_type.permission))
+        return error, 400
+
+    q_key = session.query(Key).filter(Key.key == sub_key).filter(Key.operation_id == api_key.operation_id).one_or_none()
+    if q_key is None:
+        error = Error('API Key not Found')
+        return error, 404
+    elif q_key.permission.name == 'master':
+        error = Error('Bad Request: Cannot alter Master Key')
+        return error, 400
+    else:
+        q_key.permission_level = permission.level
+
+    session.commit()
+    return key_type, 200
 
 @keycontrol.restricted(requires=['master'])
 def operation_patch(api_key, operation_name):
@@ -133,4 +223,41 @@ def operation_post(operation_name=None):
     """
     if connexion.request.is_json:
         operation_name = OperationName.from_dict(connexion.request.get_json())
-    return 'do some magic!'
+
+    if operation_name:
+        name = operation_name.name
+        public_name = operation_name.public_name
+    else:
+        name = "Operation"
+        public_name = "Operation Public"
+
+    key_value = uuid.uuid4().hex
+
+    session = application_map.Session()
+    qKey = application_map.Key
+    qOperation = application_map.Operation
+    qPermission = application_map.Permission
+
+    key_level = session.query(qPermission).filter(qPermission.name == 'master').one_or_none().level
+
+    q_master_key = qKey(
+        key=key_value,
+        permission_level=key_level)
+
+    q_operation = qOperation(
+        name=name,
+        public_name=public_name)
+
+    operation = Operation(
+        master_key=key_value,
+        name=name,
+        public_name=public_name)
+
+    session.add_all([q_master_key, q_operation])
+    session.commit()
+
+    # let sqlite decide what the operation id should be, then make sure they match
+    q_master_key.operation_id = q_operation.operation_id
+    session.commit()
+
+    return operation, 200

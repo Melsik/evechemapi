@@ -7,18 +7,17 @@ CREATE TABLE "operations" (
 );
 CREATE TABLE "keys" (
 	`key`	TEXT UNIQUE,
-	`access_level`	INTEGER,
+	`permission_level`	INTEGER,
 	`operation_id`	INTEGER,
 	PRIMARY KEY(key)
-	FOREIGN KEY(operation_id) REFERENCES operations(operation_id)
-	FOREIGN KEY(access_level) REFERENCES access_levels(access_level)
+	FOREIGN KEY(permission_level) REFERENCES permissions(level)
 );
-CREATE TABLE `access_levels` (
-	`access_level`	INTEGER,
-	`access_string`	TEXT,
-	PRIMARY KEY(access_level)
+CREATE TABLE `permissions` (
+	`level`	INTEGER,
+	`name`	TEXT,
+	PRIMARY KEY(level)
 );
-INSERT INTO `access_levels` (access_level,access_string) VALUES (1,'customer'),
+INSERT INTO `permissions` (level,name) VALUES (1,'customer'),
  (2,'auditor'),
  (3,'manager'),
  (4,'director'),

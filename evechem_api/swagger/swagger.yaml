@@ -163,12 +163,22 @@ paths:
         description: "Operation Master Access Key"
         required: true
         type: "string"
+      - name: "key_type"
+        in: "body"
+        description: "Permission level of new key"
+        required: true
+        schema:
+          $ref: "#/definitions/key_type"
       responses:
         200:
           description: "OK"
           schema:
             type: "string"
             title: "access_key"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/error"
         401:
           description: "Authentication Required"
           schema:
@@ -268,8 +278,9 @@ paths:
         description: "Operation Master Access Key"
         required: true
         type: "string"
-      - in: "body"
-        name: "key_type"
+      - name: "key_type"
+        in: "body"
+        description: "Permission level of new key"
         required: true
         schema:
           $ref: "#/definitions/key_type"
@@ -1313,6 +1324,12 @@ paths:
       #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
 definitions:
+  key_type:
+    type: "object"
+    title: key_type"
+    properties:
+      permission:
+        type: "string"
   equipment:
     type: "object"
     required:
@@ -1633,8 +1650,6 @@ definitions:
         type: "integer"
       type:
         type: "integer"
-  key_type:
-    type: "string"
   operation:
     type: "object"
     properties:

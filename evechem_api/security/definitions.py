@@ -4,7 +4,7 @@ from evechem_api.maps import application_map
 
 from evechem_api.models import Error
 
-class APIKey(BaseKey)
+class APIKey(BaseKey):
 	valid_permissions = [
 		'master',
 		'director',
@@ -13,7 +13,7 @@ class APIKey(BaseKey)
 		'customer']
 
 	def __init__(self, key_value, operation_id, permissions):
-		super(APIKey).__init__(self, key_value, permissions)
+		super(APIKey, self).__init__(key_value, permissions)
 		self.operation_id = operation_id
 
 	@classmethod
@@ -23,16 +23,16 @@ class APIKey(BaseKey)
 		q_key = q.one_or_none()
 		if q_key is not None:
 			key= cls(
-				key=q_key.key,
+				key_value=q_key.key,
 				operation_id=q_key.operation_id,
-				permissions=set(q_key.access.name)
+				permissions=[q_key.permission.name]
 				)
 			return key
 		else:
 			raise KeyNotFound("Key {} was not found.".format(key_value))
 
 class APIKeyControl(BaseKeyControl):
-	
+
 	def auth_required(self):
 		error = Error('Authentication Required')
 		return error, 401

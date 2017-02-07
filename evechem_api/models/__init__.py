@@ -19,3 +19,4 @@ from .reaction import Reaction
 from .reaction_material import ReactionMaterial
 from .tower_details import TowerDetails
 from .tower_info import TowerInfo
+from .key_type import KeyType

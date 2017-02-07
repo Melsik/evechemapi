@@ -7,7 +7,12 @@ from typing import List, Dict
 from six import iteritems
 from ..util import deserialize_date, deserialize_datetime
 
+from evechem_api.security.definitions import APIKeyControl, APIKey
 
+keycontrol = APIKeyControl(key_type=APIKey, key_param='api_key')
+
+
+@keycontrol.restricted(requires=['master'])
 def operation_delete(api_key):
     """
     operation_delete
@@ -19,7 +24,7 @@ def operation_delete(api_key):
     """
     return 'do some magic!'
 
-
+@keycontrol.restricted(requires=['master'])
 def operation_get(api_key):
     """
     operation_get
@@ -31,7 +36,7 @@ def operation_get(api_key):
     """
     return 'do some magic!'
 
-
+@keycontrol.restricted(requires=['master'])
 def operation_keys_get(api_key):
     """
     operation_keys_get
@@ -43,7 +48,7 @@ def operation_keys_get(api_key):
     """
     return 'do some magic!'
 
-
+@keycontrol.restricted(requires=['master'])
 def operation_keys_post(api_key):
     """
     operation_keys_post
@@ -55,7 +60,7 @@ def operation_keys_post(api_key):
     """
     return 'do some magic!'
 
-
+@keycontrol.restricted(requires=['master'])
 def operation_keys_sub_key_delete(sub_key, api_key):
     """
     operation_keys_sub_key_delete
@@ -69,7 +74,7 @@ def operation_keys_sub_key_delete(sub_key, api_key):
     """
     return 'do some magic!'
 
-
+@keycontrol.restricted(requires=['master'])
 def operation_keys_sub_key_get(sub_key, api_key):
     """
     operation_keys_sub_key_get
@@ -83,7 +88,7 @@ def operation_keys_sub_key_get(sub_key, api_key):
     """
     return 'do some magic!'
 
-
+@keycontrol.restricted(requires=['master'])
 def operation_keys_sub_key_patch(sub_key, api_key, key_type):
     """
     operation_keys_sub_key_patch
@@ -92,7 +97,7 @@ def operation_keys_sub_key_patch(sub_key, api_key, key_type):
     :type sub_key: str
     :param api_key: Operation Master Access Key
     :type api_key: str
-    :param key_type: 
+    :param key_type:
     :type key_type: dict | bytes
 
     :rtype: KeyType
@@ -101,7 +106,7 @@ def operation_keys_sub_key_patch(sub_key, api_key, key_type):
         key_type = KeyType.from_dict(connexion.request.get_json())
     return 'do some magic!'
 
-
+@keycontrol.restricted(requires=['master'])
 def operation_patch(api_key, operation_name):
     """
     operation_patch
@@ -116,7 +121,6 @@ def operation_patch(api_key, operation_name):
     if connexion.request.is_json:
         operation_name = OperationName.from_dict(connexion.request.get_json())
     return 'do some magic!'
-
 
 def operation_post(operation_name=None):
     """

@@ -1,9 +1,7 @@
 # coding: utf-8
-from sqlalchemy import Column, ForeignKey, PrimaryKeyConstraint, Integer, Numeric, Table, Text, Float, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, PrimaryKeyConstraint, Integer, Numeric, Table, Text, Float, Boolean, create_engine
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
 
 engine = create_engine('sqlite:///evechem_api/data/info.db')
 Session = sessionmaker(bind=engine)

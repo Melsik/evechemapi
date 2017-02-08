@@ -48,7 +48,29 @@ def operation_get(api_key):
 
     :rtype: Operation
     """
-    return str(api_key.operation_id),200
+    session = application_map.Session()
+    qOperation = application_map.Operation
+    qKey = application_map.Key
+    qPermission = application_map.Permission
+
+    master_level = session.query(qPermission).filter(qPermission.name == 'master').one().level
+
+    q_operation = session.query(qOperation).filter(qOperation.operation_id == api_key.operation_id).one()
+    q_op_keys = session.query(qKey).filter(qKey.operation_id == api_key.operation_id)
+
+    master_key = q_op_keys.filter(qKey.permission_level == master_level).one()
+    key_count = q_op_keys.count() - 1
+
+    tower_count = 0 # tower backend not implemented yet
+
+    operation = Operation(
+        master_key=master_key.key,
+        name=q_operation.name,
+        public_name=q_operation.public_name,
+        tower_count=tower_count,
+        sub_key_count=key_count)
+
+    return operation, 200
 
 @keycontrol.restricted(requires=['master'])
 def operation_keys_get(api_key):
@@ -86,7 +108,7 @@ def operation_keys_post(api_key, key_type):
     if connexion.request.is_json:
         key_type = KeyType.from_dict(connexion.request.get_json())
 
-    
+
     session = application_map.Session()
 
     Key = aliased(application_map.Key)
@@ -209,8 +231,36 @@ def operation_patch(api_key, operation_name):
     :rtype: Operation
     """
     if connexion.request.is_json:
-        operation_name = OperationName.from_dict(connexion.request.get_json())
-    return 'do some magic!'
+        op_name = OperationName.from_dict(connexion.request.get_json())
+
+    session = application_map.Session()
+    qOperation = application_map.Operation
+    qPermission = application_map.Permission
+    qKey = application_map.Key
+
+    q_operation = session.query(qOperation).filter(qOperation.operation_id == api_key.operation_id).one()
+
+    if op_name:
+        q_operation.name = op_name.name if op_name.name else q_operation.name
+        q_operation.public_name = op_name.public_name if op_name.public_name else q_operation.public_name
+
+    session.commit()
+
+    q_op_keys = session.query(qKey).filter(qKey.operation_id == api_key.operation_id)
+    master_level = session.query(qPermission).filter(qPermission.name == 'master').one().level
+    master_key = q_op_keys.filter(qKey.permission_level == master_level).one()
+    key_count = q_op_keys.count() - 1
+
+    tower_count = 0 # tower backend not implemented yet
+
+    operation = Operation(
+        master_key=master_key.key,
+        name=q_operation.name,
+        public_name=q_operation.public_name,
+        tower_count=tower_count,
+        sub_key_count=key_count)
+
+    return operation, 200
 
 def operation_post(operation_name=None):
     """

@@ -36,7 +36,7 @@ class KeyType(Model):
 
         :param dikt: A dict.
         :type: dict
-        :return: The operation_name of this KeyType.
+        :return: The key_type of this KeyType.
         :rtype: KeyType
         """
         return deserialize_model(dikt, cls)

@@ -28,7 +28,7 @@ class Equipment(Base):
     powergrid = Column(Float)
 
     group = relationship('Group')
-    groups = relationship('Group', secondary='allowed_groups')
+    groups = relationship('Group', secondary='allowed_groups', lazy='dynamic')
 
 
 class Group(Base):
@@ -71,6 +71,12 @@ class Reaction(Base):
     group = relationship('Group')
 
     materials = relationship('ReactionMaterial')
+    inputs = relationship(
+        'ReactionMaterial',
+        primaryjoin='and_(Reaction.type==ReactionMaterial.reaction_id,ReactionMaterial.is_input==True)')
+    outputs = relationship(
+        'ReactionMaterial',
+        primaryjoin='and_(Reaction.type==ReactionMaterial.reaction_id,ReactionMaterial.is_input==False)')
 
 
 class Tower(Base):

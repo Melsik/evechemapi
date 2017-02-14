@@ -2,8 +2,8 @@ from .exceptions import KeyNotFound
 
 class BaseKey(object):
 	valid_permissions = set()
-	def __init__(self, key_value, permissions=[]):
-		self.key_value = key_value
+	def __init__(self, value, permissions=[]):
+		self.value = value
 		# make sure all permissions are valid
 		for p in permissions:
 			if p not in type(self).valid_permissions:
@@ -12,10 +12,10 @@ class BaseKey(object):
 		self.permissions = set(permissions)
 
 	def __str__(self):
-		return self.key_value
+		return self.value
 
 	@classmethod
-	def lookup(cls, key_value):
+	def lookup(cls, value):
 		'''Lookup a key's permissions.  Not implemented, should be implemented in subclass.
 		This should be used to implement a custom way to lookup a key's information in a 
 		database, or other storage method.  Should lookup permissions and return an instance

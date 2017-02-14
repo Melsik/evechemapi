@@ -12,20 +12,23 @@ class APIKey(BaseKey):
 		'auditor',
 		'customer']
 
-	def __init__(self, key_value, operation_id, permissions):
-		super(APIKey, self).__init__(key_value, permissions)
+	def __init__(self, value, operation_id, permissions, name):
+		super(APIKey, self).__init__(value, permissions)
 		self.operation_id = operation_id
+		self.name = name
 
 	@classmethod
 	def lookup(cls, key_value):
+		qKey = application_map.Key
 		session = application_map.Session()
-		q = session.query(application_map.Key).filter(application_map.Key.key == key_value)
+		q = session.query(qKey).filter(qKey.value == key_value)
 		q_key = q.one_or_none()
 		if q_key is not None:
 			key= cls(
-				key_value=q_key.key,
+				value=q_key.value,
 				operation_id=q_key.operation_id,
-				permissions=[q_key.permission.name]
+				permissions=[q_key.permission],
+				name=q_key.name
 				)
 			return key
 		else:

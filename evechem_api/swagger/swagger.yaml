@@ -32,8 +32,6 @@ paths:
           description: "Forbidden"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
     post:
       tags:
@@ -54,8 +52,6 @@ paths:
           description: "OK"
           schema:
             $ref: "#/definitions/operation"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
     delete:
       tags:
@@ -81,8 +77,6 @@ paths:
           description: "Forbidden"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
     patch:
       tags:
@@ -115,8 +109,6 @@ paths:
           description: "Forbidden"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
   /operation/keys/:
     get:
@@ -136,10 +128,9 @@ paths:
           description: "OK"
           schema:
             type: "array"
-            title: "access_keys"
+            title: "keys"
             items:
-              type: "string"
-              title: "access_key"
+              $ref: "#/definitions/key"
         401:
           description: "Authentication Required"
           schema:
@@ -148,8 +139,6 @@ paths:
           description: "Forbidden"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
     post:
       tags:
@@ -163,18 +152,17 @@ paths:
         description: "Operation Master Access Key"
         required: true
         type: "string"
-      - name: "key_type"
-        in: "body"
-        description: "Permission level of new key"
+      - in: "body"
+        name: "new_key"
+        description: "Name and permission for the new key"
         required: true
         schema:
-          $ref: "#/definitions/key_type"
+          $ref: "#/definitions/key_update"
       responses:
         200:
           description: "OK"
           schema:
-            type: "string"
-            title: "access_key"
+            $ref: "#/definitions/key"
         400:
           description: "Bad Request"
           schema:
@@ -187,8 +175,6 @@ paths:
           description: "Forbidden"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
   /operation/keys/{sub_key}/:
     get:
@@ -211,7 +197,7 @@ paths:
         200:
           description: "OK"
           schema:
-            $ref: "#/definitions/key_type"
+            $ref: "#/definitions/key"
         401:
           description: "Authentication Required"
           schema:
@@ -224,8 +210,6 @@ paths:
           description: "Key Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
     delete:
       tags:
@@ -259,13 +243,11 @@ paths:
           description: "Key Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
     patch:
       tags:
       - "Operation"
-      description: "Update key_type for the given access sub-key.\n"
+      description: "Update name/permission for the given access sub-key.\n"
       operationId: "operation_keys_sub_key_patch"
       parameters:
       - name: "sub_key"
@@ -278,17 +260,17 @@ paths:
         description: "Operation Master Access Key"
         required: true
         type: "string"
-      - name: "key_type"
-        in: "body"
-        description: "Permission level of new key"
+      - in: "body"
+        name: "key_update"
+        description: "Updated values for Key"
         required: true
         schema:
-          $ref: "#/definitions/key_type"
+          $ref: "#/definitions/key_update"
       responses:
         200:
           description: "OK"
           schema:
-            $ref: "#/definitions/key_type"
+            $ref: "#/definitions/key"
         401:
           description: "Authentication Required"
           schema:
@@ -301,8 +283,6 @@ paths:
           description: "Key Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.operation_controller"
   /info/equipment/:
     get:
@@ -770,8 +750,6 @@ paths:
               type: "integer"
         401:
           description: "Authentication Required"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     post:
       tags:
@@ -784,7 +762,7 @@ paths:
       - "application/json"
       parameters:
       - in: "body"
-        name: "tower"
+        name: "tower_details"
         description: "New tower information in json format."
         required: true
         schema:
@@ -797,12 +775,12 @@ paths:
       responses:
         200:
           description: "OK"
+          schema:
+            $ref: "#/definitions/tower_details"
         401:
           description: "Authentication Required"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/:
     get:
@@ -840,8 +818,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     delete:
       tags:
@@ -874,8 +850,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     patch:
       tags:
@@ -919,8 +893,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/processes/:
     get:
@@ -959,8 +931,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     post:
       tags:
@@ -998,8 +968,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/processes/{process_id}/:
     get:
@@ -1041,8 +1009,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     delete:
       tags:
@@ -1073,8 +1039,54 @@ paths:
           description: "Forbidden"
         404:
           description: "Not Found"
-      #security:
-      #- api_key: []
+      x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
+  /towers/{tower_id}/processes/{process_id}/link/:
+    post:
+      tags:
+      - "Starbase"
+      operationId: "towers_tower_id_processes_process_id_link_post"
+      consumes:
+      - "application/json"
+      parameters:
+      - name: "tower_id"
+        in: "path"
+        description: "Tower Id number to look under."
+        required: true
+        type: "integer"
+      - name: "process_id"
+        in: "path"
+        description: "Process Id number to look under."
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "link"
+        required: true
+        schema:
+          $ref: "#/definitions/link"
+      - name: "api_key"
+        in: "query"
+        description: "Operation Access Key"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "OK"
+        400:
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/error"
+        401:
+          description: "Authentication Required"
+          schema:
+            $ref: "#/definitions/error"
+        403:
+          description: "Forbidden"
+          schema:
+            $ref: "#/definitions/error"
+        404:
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/error"
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/processes/{process_id}/equipment/:
     get:
@@ -1118,8 +1130,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     post:
       tags:
@@ -1141,7 +1151,7 @@ paths:
         required: true
         type: "integer"
       - in: "body"
-        name: "new_equipment"
+        name: "equipment"
         required: true
         schema:
           $ref: "#/definitions/new_equipment"
@@ -1171,8 +1181,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
   /towers/{tower_id}/processes/{process_id}/equipment/{equipment_id}/:
     get:
@@ -1219,8 +1227,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     delete:
       tags:
@@ -1262,8 +1268,6 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
     patch:
       tags:
@@ -1320,22 +1324,33 @@ paths:
           description: "Not Found"
           schema:
             $ref: "#/definitions/error"
-      #security:
-      #- api_key: []
       x-swagger-router-controller: "evechem_api.controllers.starbase_controller"
 definitions:
-  key_type:
+  key:
     type: "object"
-    title: key_type"
+    required:
+    - "name"
+    - "permission"
+    - "value"
     properties:
+      name:
+        type: "string"
+      value:
+        type: "string"
+      permission:
+        type: "string"
+  key_update:
+    type: "object"
+    properties:
+      name:
+        type: "string"
       permission:
         type: "string"
   equipment:
     type: "object"
     required:
     - "id"
-    - "inputs"
-    - "outputs"
+    - "type"
     - "resource"
     properties:
       contains:
@@ -1344,6 +1359,14 @@ definitions:
       id:
         type: "integer"
         description: "Unique id number for this equipment.\n"
+      type:
+        type: "integer"
+        description: "Type number for this equipment.\n"
+      name:
+        type: "string"
+      online:
+        type: "boolean"
+        description: "If the equipment is online or offline.\n"
       inputs:
         type: "array"
         description: "Array of input links.\n"
@@ -1412,27 +1435,17 @@ definitions:
     description: "CPU and Powergrid requirement of onlining this equipment.\n"
   equipment_update:
     type: "object"
-    required:
-    - "last_updated"
     properties:
       contains:
         type: "integer"
-      inputs:
-        type: "array"
-        description: "Array of input links.\n"
-        items:
-          $ref: "#/definitions/link"
       last_updated:
         type: "integer"
       online:
         type: "boolean"
-      outputs:
-        type: "array"
-        description: "Array of output links.\n"
-        items:
-          $ref: "#/definitions/link"
       resource:
         type: "integer"
+      name:
+        type: "string"
     title: "equipment_update"
   error:
     type: "object"
@@ -1449,40 +1462,18 @@ definitions:
   link:
     type: "object"
     required:
-    - "equipment"
     - "material"
     properties:
-      equipment:
+      target:
         type: "integer"
-        description: "Equipment that is the source/target of this link.\n"
-      input:
-        type: "boolean"
-        description: "Optional boolean designating if this in an input or output link.\n"
+        description: "Equipment that is the target of this link.\n"
+      source:
+        type: "integer"
+        description: "Equipment that is the source of this link.\n"
       material:
         type: "integer"
         description: "type_id of the linked material.\n"
     title: "equipment_link"
-  location:
-    type: "object"
-    required:
-    - "moon"
-    - "planet"
-    properties:
-      moon:
-        type: "integer"
-      planet:
-        type: "integer"
-      system:
-        $ref: "#/definitions/location_system"
-  location_system:
-    required:
-    - "id"
-    - "name"
-    properties:
-      id:
-        type: "integer"
-      name:
-        type: "string"
   material_info:
     required:
     - "group"
@@ -1523,8 +1514,6 @@ definitions:
   new_tower:
     type: "object"
     required:
-    - "location"
-    - "online"
     - "type"
     properties:
       cycles_at:
@@ -1533,17 +1522,27 @@ definitions:
           \ cycles.\n"
         minimum: 0
         maximum: 59
+      stront_count:
+        type: "integer"
       fuel_count:
         type: "integer"
       fuel_last_udpate:
         type: "integer"
-      location:
-        $ref: "#/definitions/location"
+      name:
+        type: "string"
+      system:
+        type: "string"
+      planet:
+        type: "integer"
+      moon:
+        type: "integer"
       online:
         type: "boolean"
         description: "Online/offline status boolean.\n"
-      owner:
-        type: "integer"
+      sov:
+        type: "boolean"
+        description: "Whether or not the tower is anchored with a sovereignty fuel\
+          \ bonus active.\n"
       type:
         type: "integer"
     title: "new_tower"
@@ -1600,14 +1599,20 @@ definitions:
           \ cycles.\n"
         minimum: 0
         maximum: 59
+      stront_count:
+        type: "integer"
       fuel_count:
         type: "integer"
       fuel_last_update:
         type: "integer"
       id:
         type: "integer"
-      location:
-        $ref: "#/definitions/location"
+      system:
+        type: "string"
+      planet:
+        type: "integer"
+      moon:
+        type: "integer"
       name:
         type: "string"
       online:

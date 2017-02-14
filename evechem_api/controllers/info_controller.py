@@ -12,7 +12,7 @@ from typing import List, Dict
 from six import iteritems
 from ..util import deserialize_date, deserialize_datetime
 
-from evechem_api.sqla_maps import info_map
+from evechem_api.maps import info_map
 from sqlalchemy.orm import aliased
 
 def _material_by_group(*group_ids):

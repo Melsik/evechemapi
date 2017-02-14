@@ -1,9 +1,7 @@
 # coding: utf-8
-from sqlalchemy import Column, ForeignKey, PrimaryKeyConstraint, Integer, Numeric, Table, Text, Float, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, PrimaryKeyConstraint, Integer, Numeric, Table, Text, Float, Boolean, create_engine
+from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
 
 engine = create_engine('sqlite:///evechem_api/data/info.db')
 Session = sessionmaker(bind=engine)
@@ -30,7 +28,7 @@ class Equipment(Base):
     powergrid = Column(Float)
 
     group = relationship('Group')
-    groups = relationship('Group', secondary='allowed_groups')
+    groups = relationship('Group', secondary='allowed_groups', lazy='dynamic')
 
 
 class Group(Base):
@@ -73,6 +71,12 @@ class Reaction(Base):
     group = relationship('Group')
 
     materials = relationship('ReactionMaterial')
+    inputs = relationship(
+        'ReactionMaterial',
+        primaryjoin='and_(Reaction.type==ReactionMaterial.reaction_id,ReactionMaterial.is_input==True)')
+    outputs = relationship(
+        'ReactionMaterial',
+        primaryjoin='and_(Reaction.type==ReactionMaterial.reaction_id,ReactionMaterial.is_input==False)')
 
 
 class Tower(Base):

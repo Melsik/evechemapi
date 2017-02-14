@@ -51,11 +51,13 @@ CREATE TABLE "equipment" (
 	`id`	INTEGER,
 	`type` INTEGER,
 	`name` TEXT,
+	`process_id`	INTEGER,
 	`last_updated`	INTEGER,
 	`resource`	INTEGER,
 	`contains`	INTEGER,
 	`online` INTEGER,
 	PRIMARY KEY(id)
+	FOREIGN KEY(process_id) REFERENCES processes(id)
 );
 CREATE TABLE "links" (
 	`target`	INTEGER,

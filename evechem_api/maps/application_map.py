@@ -46,12 +46,14 @@ class Equipment(Base):
     id = Column(Integer, primary_key=True)
     type = Column(Integer)
     name = Column(Text)
+    process_id = Column(ForeignKey('processes.id'))
     last_updated = Column(Integer)
     resource = Column(Integer)
     contains = Column(Integer)
     online = Column(Boolean)
 
 
+    links = relationship('Link', primaryjoin='or_(Equipment.id==Link.target,Equipment.id==Link.source)', cascade='all, delete-orphan')
     inputs = relationship('Link', primaryjoin='Equipment.id==Link.target')
     outputs = relationship('Link', primaryjoin='Equipment.id==Link.source')
 

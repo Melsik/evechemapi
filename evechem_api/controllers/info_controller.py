@@ -1,14 +1,196 @@
 import connexion
 from evechem_api.models.equipment_info import EquipmentInfo
+from evechem_api.models.equipment_info_fitting import EquipmentInfoFitting
 from evechem_api.models.error import Error
 from evechem_api.models.group import Group
 from evechem_api.models.material_info import MaterialInfo
 from evechem_api.models.reaction import Reaction
+from evechem_api.models.reaction_material import ReactionMaterial
 from evechem_api.models.tower_info import TowerInfo
 from datetime import date, datetime
 from typing import List, Dict
 from six import iteritems
 from ..util import deserialize_date, deserialize_datetime
+
+from evechem_api.maps import info_map
+from sqlalchemy.orm import aliased
+
+def _material_by_group(*group_ids):
+    """
+    _material_by_group
+    NOTE: Helper Function for other controllers, not independent.
+
+    Gets list of `MaterialInfo` objects from the material table by matching group_ids.
+    Search multiple groups by including them as extra parameters:
+
+    >>> _material_by_group(428, 18)
+
+    If no group is supplied, all materials are returned.
+
+    :param group_ids: Group Ids of the item that needs fetched.
+    :type group_ids: integer
+
+    :rtype: List[MaterialInfo]
+    """
+
+    session = info_map.Session()
+    if len(group_ids) > 0:
+        q = session.query(info_map.Material).filter(info_map.Material.group_id.in_(group_ids))
+    else:
+        q = session.query(info_map.Material)
+
+    mats = q.all() # return all rows from result
+    if len(mats) == 0:
+        return None
+
+    materials = []
+    for mat in mats:
+        materials.append( MaterialInfo(
+            type=mat.type,
+            group=mat.group_id,
+            name=mat.name,
+            volume=mat.volume))
+
+    return materials
+
+def _equipment_by_group(*group_ids):
+    """
+    _reaction_by_group
+    NOTE: Helper Function for other controllers, not independent.
+
+    Gets list of `Equipment` objects from the reaction and reaction_io tables by matching group_ids.
+    Search multiple groups by including them as extra parameters:
+
+    >>> _equipment_by_group(662,484)
+
+    If no group is supplied, all equipment are returned.
+
+    :param group_ids: Group Ids of the item that needs fetched.
+    :type group_ids: integer
+
+    :rtype: List[Equipment]
+
+    """
+    session = info_map.Session()
+    equipment_list = []
+    if len(group_ids) == 0:
+        q = session.query(info_map.Equipment)
+    else:
+        q = session.query(info_map.Equipment).filter(info_map.Equipment.group_id.in_(group_ids))
+
+    q_equipment_list = q.all()
+
+    if len(q_equipment_list) == 0:
+        return None
+
+    for q_equipment in q_equipment_list:
+        equipment = EquipmentInfo(
+            type=q_equipment.type,
+            name=q_equipment.name,
+            group=q_equipment.group_id,
+            capacity=q_equipment.capacity,
+            fitting=EquipmentInfoFitting(
+                cpu=q_equipment.cpu,
+                powergrid=q_equipment.powergrid),
+            allowed_groups=[g.group_id for g in q_equipment.groups])
+
+        equipment_list.append(equipment)
+
+    return equipment_list
+
+def _reaction_by_group(*group_ids):
+    """
+    _reaction_by_group
+    NOTE: Helper Function for other controllers, not independent.
+
+    Gets list of `Reaction` objects from the reaction and reaction_io tables by matching group_ids.
+    Search multiple groups by including them as extra parameters:
+
+    >>> _reaction_by_group(662,484)
+
+    If no group is supplied, all reactions are returned.
+
+    :param group_ids: Group Ids of the item that needs fetched.
+    :type group_ids: integer
+
+    :rtype: List[Reaction]
+    """
+    session = info_map.Session()
+    reactions = []
+    if len(group_ids) == 0:
+        q = session.query(info_map.Reaction)
+    else:
+        q = session.query(info_map.Reaction).filter(info_map.Reaction.group_id.in_(group_ids))
+    q_reactions = q.all()
+    if len(q_reactions) == 0:
+        return None
+
+    for q_reaction in q_reactions:
+
+        outputs = []
+        inputs = []
+        for row in q_reaction.materials:
+            reaction_mat = ReactionMaterial(
+                type=row.material_id,
+                name=row.material.name,
+                amount=row.quantity
+                )
+
+            if row.is_input:
+                inputs.append(reaction_mat)
+            else:
+                outputs.append(reaction_mat)
+
+        reaction = Reaction(
+            type=q_reaction.type,
+            name=q_reaction.name,
+            inputs=inputs,
+            outputs=outputs) 
+
+        reactions.append(reaction)
+
+    return reactions
+
+def _reaction_by_type(type_id):
+    """
+    _reaction_by_type
+    NOTE: Helper Function for other controllers, not independent.
+
+    Gets a `Reaction` object from the material table by matching type_id.
+
+    :param group_ids: Group Ids of the item that needs fetched.
+    :type group_ids: integer
+
+    :rtype: List[Reaction]
+    """
+    session = info_map.Session()
+
+    q = session.query(info_map.Reaction).filter(info_map.Reaction.type==type_id)
+    q_reaction = q.one_or_none()
+    if q_reaction is None:
+        return None
+
+    outputs = []
+    inputs = []
+    for row in q_reaction.materials:
+        reaction_mat = ReactionMaterial(
+            type=row.material_id,
+            name=row.material.name,
+            amount=row.quantity
+            )
+
+        if row.is_input:
+            inputs.append(reaction_mat)
+        else:
+            outputs.append(reaction_mat)
+
+    reaction = Reaction(
+        type=q_reaction.type,
+        name=q_reaction.name,
+        inputs=inputs,
+        outputs=outputs) 
+
+    return reaction
 
 
 def info_equipment_get():
@@ -18,7 +200,8 @@ def info_equipment_get():
 
     :rtype: List[EquipmentInfo]
     """
-    return 'do some magic!'
+    equipment = _equipment_by_group()
+    return equipment, 200
 
 
 def info_equipment_reactors_get():
@@ -28,7 +211,8 @@ def info_equipment_reactors_get():
 
     :rtype: List[EquipmentInfo]
     """
-    return 'do some magic!'
+    equipment = _equipment_by_group(438) # 438 == Mobile Reactor
+    return equipment, 200
 
 
 def info_equipment_silos_get():
@@ -38,7 +222,8 @@ def info_equipment_silos_get():
 
     :rtype: List[EquipmentInfo]
     """
-    return 'do some magic!'
+    equipment = _equipment_by_group(404) # 404 == Silo
+    return equipment, 200
 
 
 def info_equipment_type_id_get(type_id):
@@ -50,7 +235,27 @@ def info_equipment_type_id_get(type_id):
 
     :rtype: EquipmentInfo
     """
-    return 'do some magic!'
+    session = info_map.Session()
+
+    q = session.query(info_map.Equipment).filter(info_map.Equipment.type == type_id)
+    q_equipment = q.one_or_none()
+
+    if q_equipment is not None:
+        equipment = EquipmentInfo(
+            type=q_equipment.type,
+            name=q_equipment.name,
+            group=q_equipment.group_id,
+            capacity=q_equipment.capacity,
+            fitting=EquipmentInfoFitting(
+                cpu=q_equipment.cpu,
+                powergrid=q_equipment.powergrid),
+            allowed_groups=[g.group_id for g in q_equipment.groups])
+
+        return equipment
+
+    else:
+        error = Error('Type {} Not Found'.format(type_id))
+        return error, 404
 
 
 def info_materials_booster_get():
@@ -60,7 +265,8 @@ def info_materials_booster_get():
 
     :rtype: List[MaterialInfo]
     """
-    return 'do some magic!'
+    materials = _material_by_group(712) # 712 == intermediate group
+    return materials, 200
 
 
 def info_materials_composites_get():
@@ -70,7 +276,8 @@ def info_materials_composites_get():
 
     :rtype: List[MaterialInfo]
     """
-    return 'do some magic!'
+    materials = _material_by_group(429) # 429 == intermediate group
+    return materials, 200
 
 
 def info_materials_gas_get():
@@ -80,7 +287,8 @@ def info_materials_gas_get():
 
     :rtype: List[MaterialInfo]
     """
-    return 'do some magic!'
+    materials = _material_by_group(711) # 711 == intermediate group
+    return materials, 200
 
 
 def info_materials_get():
@@ -90,7 +298,8 @@ def info_materials_get():
 
     :rtype: List[MaterialInfo]
     """
-    return 'do some magic!'
+    materials = _material_by_group() # empty means all groups
+    return materials, 200
 
 
 def info_materials_groups_get():
@@ -100,7 +309,14 @@ def info_materials_groups_get():
 
     :rtype: List[Group]
     """
-    return 'do some magic!'
+    session = info_map.Session()
+
+    mat = aliased(info_map.Material)
+    grp = aliased(info_map.Group)
+
+    q = session.query(mat.group_id,grp.name).join(grp).distinct()
+    groups = [Group(group=row.group_id,name=row.name) for row in q.all()]
+    return groups, 200
 
 
 def info_materials_intermediates_get():
@@ -110,7 +326,8 @@ def info_materials_intermediates_get():
 
     :rtype: List[MaterialInfo]
     """
-    return 'do some magic!'
+    materials = _material_by_group(428) # 428 == intermediate group
+    return materials, 200
 
 
 def info_materials_polymer_get():
@@ -120,7 +337,8 @@ def info_materials_polymer_get():
 
     :rtype: List[MaterialInfo]
     """
-    return 'do some magic!'
+    materials = _material_by_group(974) # 974 == intermediate group
+    return materials, 200
 
 
 def info_materials_raw_get():
@@ -130,7 +348,8 @@ def info_materials_raw_get():
 
     :rtype: List[MaterialInfo]
     """
-    return 'do some magic!'
+    materials = _material_by_group(427) # 427 == intermediate group
+    return materials, 200
 
 
 def info_materials_type_id_get(type_id):
@@ -142,8 +361,21 @@ def info_materials_type_id_get(type_id):
 
     :rtype: MaterialInfo
     """
-    return 'do some magic!'
+    session = info_map.Session()
+    q = session.query(info_map.Material).filter(info_map.Material.type == type_id)
 
+    mat = q.one_or_none() # return the only result or `None`
+
+    if mat is not None:
+        material_info = MaterialInfo(
+            type=mat.type,
+            group=mat.group_id,
+            name=mat.name,
+            volume=mat.volume)
+        return material_info, 200
+    else:
+        error = Error('Type {} Not Found'.format(type_id))
+        return error, 404
 
 def info_reactions_complex_biochemical_get():
     """
@@ -152,7 +384,8 @@ def info_reactions_complex_biochemical_get():
 
     :rtype: List[Reaction]
     """
-    return 'do some magic!'
+    reactions = _reaction_by_group(662) # 662 == Complex Biochemical Reactions
+    return reactions, 200
 
 
 def info_reactions_complex_get():
@@ -162,7 +395,8 @@ def info_reactions_complex_get():
 
     :rtype: List[Reaction]
     """
-    return 'do some magic!'
+    reactions = _reaction_by_group(484) # 484 == Complex Reactions
+    return reactions, 200
 
 
 def info_reactions_get():
@@ -172,7 +406,9 @@ def info_reactions_get():
 
     :rtype: List[Reaction]
     """
-    return 'do some magic!'
+    reactions = _reaction_by_group()
+    return reactions, 200
+
 
 
 def info_reactions_polymer_get():
@@ -182,7 +418,8 @@ def info_reactions_polymer_get():
 
     :rtype: List[Reaction]
     """
-    return 'do some magic!'
+    reactions = _reaction_by_group(977) # 977 == Hybrid Reactions
+    return reactions, 200
 
 
 def info_reactions_simple_biochemical_get():
@@ -192,7 +429,8 @@ def info_reactions_simple_biochemical_get():
 
     :rtype: List[Reaction]
     """
-    return 'do some magic!'
+    reactions = _reaction_by_group(661) # 661 == Simple Biochemical Reactions
+    return reactions, 200
 
 
 def info_reactions_simple_get():
@@ -202,7 +440,8 @@ def info_reactions_simple_get():
 
     :rtype: List[Reaction]
     """
-    return 'do some magic!'
+    reactions = _reaction_by_group(436) # 436 == Simple Reaction
+    return reactions, 200
 
 
 def info_reactions_type_id_get(type_id):
@@ -214,7 +453,12 @@ def info_reactions_type_id_get(type_id):
 
     :rtype: Reaction
     """
-    return 'do some magic!'
+    reactions = _reaction_by_type(type_id)
+    if reactions is None:
+        error = Error('Type {} Not Found'.format(type_id))
+        return error, 404
+    else:
+        return reactions, 200
 
 
 def info_towers_get():
@@ -224,7 +468,27 @@ def info_towers_get():
 
     :rtype: List[TowerInfo]
     """
-    return 'do some magic!'
+    session = info_map.Session()
+
+    q = session.query(info_map.Tower)
+    q_towers = q.all()
+    towers = []
+    for q_tower in q_towers:
+        tower = TowerInfo(
+            type=q_tower.type,
+            fuel_bay=q_tower.fuel_bay,
+            stront_bay=q_tower.stront_bay,
+            name=q_tower.name,
+            storage_mult=q_tower.storage_mult,
+            cpu=q_tower.cpu,
+            powergrid=q_tower.powergrid,
+            fuel_usage=q_tower.fuel_usage,
+            stront_usage=q_tower.stront_usage,
+            fuel_type=q_tower.fuel_type)
+
+        towers.append(tower)
+
+    return towers, 200
 
 
 def info_towers_type_id_get(type_id):
@@ -236,4 +500,27 @@ def info_towers_type_id_get(type_id):
 
     :rtype: TowerInfo
     """
-    return 'do some magic!'
+    session = info_map.Session()
+
+    q = session.query(info_map.Tower).filter(info_map.Tower.type==type_id)
+    q_tower = q.one_or_none()
+
+    if q_tower is None:
+        error = Error('Type {} Not Found'.format(type_id))
+        return error, 404
+    else:
+        tower = TowerInfo(
+            type=q_tower.type,
+            fuel_bay=q_tower.fuel_bay,
+            stront_bay=q_tower.stront_bay,
+            name=q_tower.name,
+            storage_mult=q_tower.storage_mult,
+            cpu=q_tower.cpu,
+            powergrid=q_tower.powergrid,
+            fuel_usage=q_tower.fuel_usage,
+            stront_usage=q_tower.stront_usage,
+            fuel_type=q_tower.fuel_type)
+
+        return tower, 200
+
+

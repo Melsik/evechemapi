@@ -1,17 +1,73 @@
 BEGIN TRANSACTION;
 CREATE TABLE "towers" (
 	`type`	INTEGER,
-	`fuel_bay`	NUMERIC,
-	`stront_bay`	NUMERIC,
+	`fuel_bay`	REAL,
+	`stront_bay`	REAL,
 	`name`	TEXT,
-	`storage_mult`	NUMERIC,
-	`cpu`	NUMERIC,
-	`powergrid`	NUMERIC,
+	`storage_mult`	REAL,
+	`cpu`	REAL,
+	`powergrid`	REAL,
 	`fuel_usage`	INTEGER,
 	`stront_usage`	INTEGER,
 	`fuel_type`	INTEGER,
-	PRIMARY KEY(type)
+	PRIMARY KEY(type),
+	FOREIGN KEY(fuel_type) REFERENCES materials(type)
 );
+
+CREATE TABLE "reactions" (
+	`type`	INTEGER,
+	`group_id`	INTEGER,
+	`name`	TEXT,
+	PRIMARY KEY(type),
+	FOREIGN KEY(group_id) REFERENCES groups(group_id)
+);
+
+-- Input and output materials and the quantities related to each reaction.
+CREATE TABLE "reaction_io" (
+	`reaction`	INTEGER,
+	`is_input`	INTEGER,
+	`material`	INTEGER,
+	`quantity`	INTEGER,
+	PRIMARY KEY(reaction,is_input,material),
+	FOREIGN KEY(reaction) REFERENCES reactions(type),
+	FOREIGN KEY(material) REFERENCES materials(type)
+);
+
+-- Basic material information.
+CREATE TABLE "materials" (
+	`type`	INTEGER,
+	`group_id`	INTEGER,
+	`name`	TEXT,
+	`volume`	REAL,
+	PRIMARY KEY(type),
+	FOREIGN KEY(group_id) REFERENCES groups(group_id)
+);
+
+CREATE TABLE "groups" (
+	`group_id`	INTEGER,
+	`name`	TEXT,
+	PRIMARY KEY(group_id)
+);
+
+CREATE TABLE "equipment" (
+	`type`	INTEGER,
+	`group_id`	INTEGER,
+	`name`	TEXT,
+	`capacity`	REAL,
+	`cpu`	REAL,
+	`powergrid`	REAL,
+	PRIMARY KEY(type),
+	FOREIGN KEY(group_id) REFERENCES groups(group_id)
+);
+
+-- Relates equipment with type groups they may store.
+CREATE TABLE "allowed_groups" (
+	`equipment`	INTEGER,
+	`resource_group`	INTEGER,
+	FOREIGN KEY(equipment) REFERENCES equipment(type),
+	FOREIGN KEY(resource_group) REFERENCES groups(group_id)
+);
+
 INSERT INTO `towers` (type,fuel_bay,stront_bay,name,storage_mult,cpu,powergrid,fuel_usage,stront_usage,fuel_type) VALUES (12235,140000,50000,'Amarr Control Tower',1.5,5500,5000000,40,400,4247),
  (12236,140000,50000,'Gallente Control Tower',2,6750,3750000,40,400,4312),
  (16213,140000,50000,'Caldari Control Tower',1,7500,2750000,40,400,4051),
@@ -54,13 +110,8 @@ INSERT INTO `towers` (type,fuel_bay,stront_bay,name,storage_mult,cpu,powergrid,f
  (27786,140000,50000,'True Sansha Control Tower',1.5,5500,5000000,32,400,4247),
  (27788,70000,25000,'True Sansha Control Tower Medium',1.5,2750,2500000,16,200,4247),
  (27790,35000,12500,'True Sansha Control Tower Small',1.5,1375,1250000,8,100,4247);
-CREATE TABLE "reaction_names" (
-	`type`	INTEGER,
-	`group_id`	INTEGER,
-	`name`	TEXT,
-	PRIMARY KEY(type)
-);
-INSERT INTO `reaction_names` (type,group_id,name) VALUES (16868,661,'Standard Blue Pill Booster Reaction'),
+
+INSERT INTO `reactions` (type,group_id,name) VALUES (16868,661,'Standard Blue Pill Booster Reaction'),
  (17941,436,'Caesarium Cadmide Reaction'),
  (17942,436,'Carbon Polymers Reaction'),
  (17943,436,'Ceramic Powder Reaction'),
@@ -155,13 +206,8 @@ INSERT INTO `reaction_names` (type,group_id,name) VALUES (16868,661,'Standard Bl
  (33364,484,'Photonic Metamaterials Reaction'),
  (33365,484,'Plasmonic Metamaterials Reaction'),
  (33366,484,'Terahertz Metamaterials Reaction');
-CREATE TABLE "reaction_io" (
-	`reaction`	INTEGER,
-	`input`	INTEGER,
-	`material`	INTEGER,
-	`quantity`	INTEGER
-);
-INSERT INTO `reaction_io` (reaction,input,material,quantity) VALUES (16868,0,3645,95),
+
+INSERT INTO `reaction_io` (reaction,is_input,material,quantity) VALUES (16868,0,3645,95),
  (16868,0,25237,15),
  (16868,1,3645,100),
  (16868,1,25268,20),
@@ -499,13 +545,7 @@ INSERT INTO `reaction_io` (reaction,input,material,quantity) VALUES (16868,0,364
  (33366,0,33360,300),
  (33366,1,16657,100),
  (33366,1,33337,100);
-CREATE TABLE "materials" (
-	`type`	INTEGER,
-	`group_id`	INTEGER,
-	`name`	TEXT,
-	`volume`	NUMERIC,
-	PRIMARY KEY(type)
-);
+
 INSERT INTO `materials` (type,group_id,name,volume) VALUES (34,18,'Tritanium',0.01),
  (35,18,'Pyerite',0.01),
  (36,18,'Mexallon',0.01),
@@ -662,11 +702,7 @@ INSERT INTO `materials` (type,group_id,name,volume) VALUES (34,18,'Tritanium',0.
  (33360,429,'Terahertz Metamaterials',1),
  (33361,429,'Plasmonic Metamaterials',1),
  (33362,429,'Nonlinear Metamaterials',1);
-CREATE TABLE "groups" (
-	`group_id`	INTEGER,
-	`name`	TEXT,
-	PRIMARY KEY(group_id)
-);
+
 INSERT INTO `groups` (group_id,name) VALUES (18,'Mineral'),
  (280,'General'),
  (284,'Biohazard'),
@@ -687,15 +723,7 @@ INSERT INTO `groups` (group_id,name) VALUES (18,'Mineral'),
  (977,'Hybrid Reactions'),
  (1042,'Basic Commodities'),
  (1136,'Fuel Block');
-CREATE TABLE "equipment" (
-	`type`	INTEGER,
-	`group_id`	INTEGER,
-	`name`	TEXT,
-	`capacity`	NUMERIC,
-	`cpu`	NUMERIC,
-	`powergrid`	NUMERIC,
-	PRIMARY KEY(type)
-);
+
 INSERT INTO `equipment` (type,group_id,name,capacity,cpu,powergrid) VALUES (14343,404,'Silo',20000,500,50000),
  (16221,416,'Moon Harvesting Array',1,500,10000),
  (16869,438,'Complex Reactor Array',1,3000,250000),
@@ -709,10 +737,7 @@ INSERT INTO `equipment` (type,group_id,name,capacity,cpu,powergrid) VALUES (1434
  (25821,404,'General Storage',20000,250,50000),
  (30655,404,'Hybrid Polymer Silo',40000,250,50000),
  (30656,438,'Polymer Reactor Array',1,1500,125000);
-CREATE TABLE "allowed_groups" (
-	`equipment`	INTEGER,
-	`resource_group`	INTEGER
-);
+
 INSERT INTO `allowed_groups` (equipment,resource_group) VALUES (30656,977),
  (30655,974),
  (25821,280),
